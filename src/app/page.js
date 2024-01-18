@@ -1,6 +1,6 @@
 "use client"; // This is a client component 👈🏽
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Typography,
   Container,
@@ -15,6 +15,7 @@ import MappedToggleButton from './components/MappedToggleButton';
 export default function Home() {
   const [category, setCategory] = useState('');
   const [difficulty, setDifficulty] = useState('');
+  const [categoryList, setCategoryList] = useState({});
   const CATEGORY = 'Select a Category';
   const DIFFIFCULTY = 'Select a difficulty';
 
@@ -25,11 +26,25 @@ export default function Home() {
     setChange(newValue);
   };
 
-  const categories = ['category 1', 'category 2', 'category 3', 'category 4', 'category 5'];
-  const difficulties = ['easy', 'medium', 'hard'];
+  useEffect(() => {
+    fetch('https://opentdb.com/api_category.php')
+      .then(response => response.json())
+      .then(data => setCategoryList(data.trivia_categories))
+      .catch(error => console.log(error));
+  }, []);
+
+  console.log('dahhh', categoryList);
+
+  const APIUrl = `https://opentdb.com/api.php?amount=10&category=${category}&difficulty=${difficulty}&type=multiple`;
+
+  const difficulties = { 
+    0: { id: 'easy', name: 'easy' },
+    1: { id: 'medium', name: 'medium' },
+    2: { id: 'hard', name: 'hard' }
+  };
   
   return (
-    <Box height="100vh" display="flex" flexDirection="column" justifyContent="space-around" sx={{ bgcolor: 'white' }}>
+    <Box minHeight="100vh" display="flex" flexDirection="column" justifyContent="space-around" sx={{ bgcolor: 'white' }}>
       <Container>
         <StyledH1 text={'Trivia Quiz'} />
         <StyledH2 text={'Trivia Quiz Description'} />
@@ -37,7 +52,7 @@ export default function Home() {
       <Container>
         <StyledH3 text={'Select a Category'} />
         <MappedToggleButton 
-          array={categories}
+          object={categoryList}
           state={category}
           setState={setCategory}
           handleSetState={handleButtonGroup}
@@ -47,7 +62,7 @@ export default function Home() {
       <Container>
       <StyledH3 text={'Select a Difficulty'} />
         <MappedToggleButton 
-          array={difficulties}
+          object={difficulties}
           state={difficulty}
           setState={setDifficulty}
           handleSetState={handleButtonGroup}

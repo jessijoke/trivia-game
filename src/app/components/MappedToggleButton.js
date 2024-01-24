@@ -15,12 +15,18 @@ const MappedToggleButton = ({ object, state, setState, handleSetState, ariaLabel
         aria-label={ariaLabel}
     >
     <Container 
-        display="flex"
         flexDirection="row"
         flexWrap="wrap"
+        flex="1"
     >
         {Object.keys(object).map((id, index) => (
-            <ToggleButton key={`${object[id].name}-${index}`} value={index} aria-label={object[id].name}>
+            <ToggleButton 
+                key={`${object[id].name}-${index}`}
+                value={index}
+                aria-label={object[id].name}
+                gridTemplateColumns="max-content"
+                flexGrow="1"
+            >
                 {object[id].name}
             </ToggleButton>
         ))}

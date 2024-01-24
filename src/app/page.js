@@ -33,8 +33,6 @@ export default function Home() {
       .catch(error => console.log(error));
   }, []);
 
-  console.log('dahhh', categoryList);
-
   const APIUrl = `https://opentdb.com/api.php?amount=10&category=${category}&difficulty=${difficulty}&type=multiple`;
 
   const difficulties = { 
@@ -45,7 +43,7 @@ export default function Home() {
   
   return (
     <Box minHeight="100vh" display="flex" flexDirection="column" justifyContent="space-around" sx={{ bgcolor: 'white' }}>
-      <Container>
+      <Container fullWidth >
         <StyledH1 text={'Trivia Quiz'} />
         <StyledH2 text={'Trivia Quiz Description'} />
       </Container>

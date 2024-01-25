@@ -1,75 +1,92 @@
 "use client"; // This is a client component 👈🏽
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+
 import { 
-  Typography,
   Container,
   Box,
   Button,
 } from '@mui/material';
-import StyledH1 from '../app/components/styledH1';
-import StyledH2 from '../app/components/StyledH2';
-import StyledH3 from '../app/components/StyledH3';
-import MappedToggleButton from './components/MappedToggleButton';
+import { StyledH1, StyledH2, StyledH3, MappedToggleButton } from '../app/components/';
 
 export default function Home() {
+  const router = useRouter();
+
   const [category, setCategory] = useState('');
   const [difficulty, setDifficulty] = useState('');
   const [categoryList, setCategoryList] = useState({});
+
   const CATEGORY = 'Select a Category';
   const DIFFIFCULTY = 'Select a difficulty';
 
+  console.log(categoryList);
+
   const handleButtonGroup = (
-    setChange, ariaLabel
-  ) => (event, newValue
+    setChange
+  ) => ( newValue
   ) => {
     setChange(newValue);
   };
+  console.log(categoryList);
+
+  const navigateToQuiz = () => {
+    const query = { category: category, difficulty: difficulty };
+    router.push(`/quiz/?category=${category}${difficulty ? `&difficulty=${difficulty}` : ''}`);
+  };
 
   useEffect(() => {
+    if (category.length >= 1) return;
     fetch('https://opentdb.com/api_category.php')
       .then(response => response.json())
-      .then(data => setCategoryList(data.trivia_categories))
+      .then(data => {
+        const transformedData = data.trivia_categories.map(category => ({
+          id: category.id,
+          name: category.name,
+        }));
+        console.log(transformedData);
+        setCategoryList(transformedData);
+      })
+      // .then(data => setCategoryList(JSON.stringify(data.trivia_categories)))
       .catch(error => console.log(error));
   }, []);
 
-  const APIUrl = `https://opentdb.com/api.php?amount=10&category=${category}&difficulty=${difficulty}&type=multiple`;
-
-  const difficulties = { 
-    0: { id: 'easy', name: 'easy' },
-    1: { id: 'medium', name: 'medium' },
-    2: { id: 'hard', name: 'hard' }
-  };
+  const difficulties = [
+    { id: 'easy', name: 'easy' },
+    { id: 'medium', name: 'medium' },
+    { id: 'hard', name: 'hard' }
+  ];
   
   return (
-    <Box minHeight="100vh" display="flex" flexDirection="column" justifyContent="space-around" sx={{ bgcolor: 'white' }}>
-      <Container fullWidth >
-        <StyledH1 text={'Trivia Quiz'} />
-        <StyledH2 text={'Trivia Quiz Description'} />
-      </Container>
-      <Container>
-        <StyledH3 text={'Select a Category'} />
-        <MappedToggleButton 
-          object={categoryList}
-          state={category}
-          setState={setCategory}
-          handleSetState={handleButtonGroup}
-          ariaLabel={CATEGORY}
-        />
-      </Container>
-      <Container>
-      <StyledH3 text={'Select a Difficulty'} />
-        <MappedToggleButton 
-          object={difficulties}
-          state={difficulty}
-          setState={setDifficulty}
-          handleSetState={handleButtonGroup}
-          ariaLabel={DIFFIFCULTY}
-        />
-      </Container>
-      <Container>
-        <Button variant='contained'>Start Button</Button>
-      </Container>
-    </Box>
+    <Container>
+      <Box minHeight="100vh" display="flex" flexDirection="column" justifyContent="space-around" sx={{ bgcolor: 'white' }}>
+        <Container>
+          <StyledH1 text={'Trivia Quiz'} />
+          <StyledH2 text={'Trivia Quiz Description'} />
+        </Container>
+        <Container>
+          <StyledH3 text={'Select a Category'} />
+            <MappedToggleButton
+              object={categoryList}
+              state={category}
+              setState={setCategory}
+              ariaLabel={CATEGORY}
+            />
+        </Container>
+        <Container>
+        <StyledH3 text={'Select a Difficulty'} />
+          <MappedToggleButton
+            object={difficulties}
+            state={difficulty}
+            setState={setDifficulty}
+            handleSetState={handleButtonGroup}
+            ariaLabel={DIFFIFCULTY}
+          />
+        </Container>
+        <Container>
+          <Button variant='contained' onClick={navigateToQuiz}>Start Button</Button>
+        </Container>
+      </Box>
+    </Container>
   )
 }

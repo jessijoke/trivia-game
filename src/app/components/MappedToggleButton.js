@@ -2,36 +2,40 @@ import React from 'react';
 import { 
     ToggleButton,
     ToggleButtonGroup,
-    Container,
-    Typography,
+    Grid,
 } from '@mui/material';
-import StyledH3 from './StyledH3';
 
-const MappedToggleButton = ({ object, state, setState, handleSetState, ariaLabel }) => (
-    <ToggleButtonGroup
+const MappedToggleButton = ({ object, state, setState, ariaLabel }) => {
+    const handleToggle = (value) => {
+      const isSelected = state === value;
+      setState(isSelected ? null : value);
+    };
+  
+    return (
+      <ToggleButtonGroup
         value={state}
         exclusive
-        onChange={handleSetState(setState)}
+        onChange={(event, value) => handleToggle(value)}
         aria-label={ariaLabel}
-    >
-    <Container 
-        flexDirection="row"
-        flexWrap="wrap"
-        flex="1"
-    >
-        {Object.keys(object).map((id, index) => (
-            <ToggleButton 
-                key={`${object[id].name}-${index}`}
-                value={index}
+      >
+        <Grid container justifyContent="center" alignItems="center">
+          {Object.keys(object).map((id, index) => (
+            <Grid item key={`${object[id].name}-${index}`} xs={12} md={5} lg={4}>
+              <ToggleButton
+                value={id}
                 aria-label={object[id].name}
-                gridTemplateColumns="max-content"
-                flexGrow="1"
-            >
+                style={{
+                  width: '100%',
+                  height: '100%',
+                }}
+              >
                 {object[id].name}
-            </ToggleButton>
-        ))}
-    </Container>
-    </ToggleButtonGroup>
-);
+              </ToggleButton>
+            </Grid>
+          ))}
+        </Grid>
+      </ToggleButtonGroup>
+    );
+  };
 
 export default MappedToggleButton;

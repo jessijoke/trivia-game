@@ -22,7 +22,7 @@ const MappedToggleButton = ({ object, state, setState, ariaLabel }) => {
           {Object.keys(object).map((id, index) => (
             <Grid item key={`${object[id].name}-${index}`} xs={12} md={5} lg={4}>
               <ToggleButton
-                value={id}
+                value={object[id].id}
                 aria-label={object[id].name}
                 style={{
                   width: '100%',

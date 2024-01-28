@@ -3,12 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
-import { 
+import {
   Container,
   Box,
   Button,
 } from '@mui/material';
 import { StyledH1, StyledH2, StyledH3, MappedToggleButton } from '../app/components/';
+import { CATEGORY, DIFFICULTY, DIFFICULTIES } from './consts.js';
+import { useQuiz } from './QuizContext';
 
 export default function Home() {
   const router = useRouter();
@@ -16,23 +18,21 @@ export default function Home() {
   const [category, setCategory] = useState('');
   const [difficulty, setDifficulty] = useState('');
   const [categoryList, setCategoryList] = useState({});
+  const { quizData, setQuizData } = useQuiz();
 
-  const CATEGORY = 'Select a Category';
-  const DIFFIFCULTY = 'Select a difficulty';
-
-  console.log(categoryList);
+  const APIUrl = `https://opentdb.com/api.php?amount=10&category=${category}${difficulty !== null ? `&difficulty=${difficulty}` : ''}&type=multiple`;
 
   const handleButtonGroup = (
     setChange
-  ) => ( newValue
+  ) => (newValue
   ) => {
-    setChange(newValue);
+      console.log(newValue);
+      setChange(newValue);
   };
-  console.log(categoryList);
 
   const navigateToQuiz = () => {
-    const query = { category: category, difficulty: difficulty };
-    router.push(`/quiz/?category=${category}${difficulty ? `&difficulty=${difficulty}` : ''}`);
+    fetchQuizData();
+    router.push(`/quiz`);
   };
 
   useEffect(() => {
@@ -44,19 +44,22 @@ export default function Home() {
           id: category.id,
           name: category.name,
         }));
-        console.log(transformedData);
         setCategoryList(transformedData);
       })
-      // .then(data => setCategoryList(JSON.stringify(data.trivia_categories)))
-      .catch(error => console.log(error));
+      .catch(error => console.error(error));
   }, []);
 
-  const difficulties = [
-    { id: 'easy', name: 'easy' },
-    { id: 'medium', name: 'medium' },
-    { id: 'hard', name: 'hard' }
-  ];
-  
+  const fetchQuizData = () => {
+    console.log(APIUrl);
+    fetch(APIUrl)
+      .then(response => response.json())
+      .then(data => {
+        console.log(data); // Log the fetched data
+        setQuizData(data.results); // Update the quizData state with the fetched data
+      })
+      .catch(error => console.error(error));
+  };
+
   return (
     <Container>
       <Box minHeight="100vh" display="flex" flexDirection="column" justifyContent="space-around" sx={{ bgcolor: 'white' }}>
@@ -66,21 +69,21 @@ export default function Home() {
         </Container>
         <Container>
           <StyledH3 text={'Select a Category'} />
-            <MappedToggleButton
-              object={categoryList}
-              state={category}
-              setState={setCategory}
-              ariaLabel={CATEGORY}
-            />
+          <MappedToggleButton
+            object={categoryList}
+            state={category}
+            setState={setCategory}
+            ariaLabel={CATEGORY}
+          />
         </Container>
         <Container>
-        <StyledH3 text={'Select a Difficulty'} />
+          <StyledH3 text={'Select a Difficulty'} />
           <MappedToggleButton
-            object={difficulties}
+            object={DIFFICULTIES}
             state={difficulty}
             setState={setDifficulty}
-            handleSetState={handleButtonGroup}
-            ariaLabel={DIFFIFCULTY}
+            // handleSetState={handleButtonGroup}
+            ariaLabel={DIFFICULTY}
           />
         </Container>
         <Container>

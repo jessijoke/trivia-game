@@ -32,15 +32,12 @@ const Page = () => {
   return (
     <div>
       <h1>Quiz</h1>
-      {/* Render your quiz content here using currentQuestion */}
       {currentQuestion && (
         <div>
           <p>Question {currentPage}</p>
           <p>{currentQuestion.text}</p>
-          {/* Render other details of the question */}
         </div>
       )}
-      {/* Add pagination controls/buttons */}
       <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
         Previous Question
       </button>

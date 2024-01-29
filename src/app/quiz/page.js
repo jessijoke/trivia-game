@@ -3,13 +3,17 @@
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useQuiz } from '../QuizContext';
-import { Script } from 'next/script';
+import { useSearchParams } from 'next/navigation'
 
-const Page = () => {
+const Page = ({ params }) => {
+  const searchParams = useSearchParams();
+  const page = searchParams.get('page') || 1;
   const router = useRouter();
-  const { page } = router.query ?? { page: 1 };
+  console.log('testing params', page);
   const [currentPage, setCurrentPage] = useState(1);
   const { quizData, setQuizData } = useQuiz();
+  console.log('the current question is ', quizData[page]);
+
 
     useEffect(() => {
         console.log(quizData);
@@ -24,7 +28,7 @@ const Page = () => {
 
   const handlePageChange = (newPage, event) => {
     event.preventDefault();
-    router.push(`/?page=${newPage}`);
+    router.push(`/quiz?page=${newPage}`);
   };
 
   const currentQuestion = quizData[currentPage - 1]; // Adjust for zero-based index
@@ -35,7 +39,7 @@ const Page = () => {
       {currentQuestion && (
         <div>
           <p>Question {currentPage}</p>
-          <p>{currentQuestion.text}</p>
+          <p>{currentQuestion.question}</p>
         </div>
       )}
       <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>

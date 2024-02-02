@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
     ToggleButton,
     ToggleButtonGroup,
@@ -10,6 +10,10 @@ const MappedToggleButton = ({ object, state, setState, ariaLabel, value = 'id' }
       const isSelected = state === value;
       setState(isSelected ? null : value);
     };
+    useEffect(() => {
+      console.log('receieved answers', object)
+    }, [object])
+    
   
     return (
       <ToggleButtonGroup

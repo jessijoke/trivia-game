@@ -59,7 +59,7 @@ export default function Home() {
       })
       .catch(error => console.error(error));
   };
-  console.log('categoryList', categoryList)
+  console.log('categoryList', )
 
   return (
     <Container>

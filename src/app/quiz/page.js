@@ -11,13 +11,10 @@ const Page = ({ params }) => {
   const page = searchParams.get('page') || 1;
   const router = useRouter();
   const [currentPage, setCurrentPage] = useState(1);
+  const [allAnswers, setAllAnswers] = useState([]); // This is the state that will hold the answers array
   const { quizData, setQuizData } = useQuiz();
   const [answer, setAnswer] = useState('');
   const ANSWER = 'answer';
-
-  useEffect(() => {
-      console.log(quizData);
-  }, [quizData]);
 
   useEffect(() => {
     if (page) {
@@ -33,33 +30,26 @@ const Page = ({ params }) => {
 
   const currentQuestion = quizData[currentPage - 1]; // Adjust for zero-based index
 
-  let answers = [];
-  let allAnswers = [];
-
   useEffect(() => {
     if (currentQuestion) {
-      answers = [...currentQuestion?.incorrect_answers, currentQuestion?.correct_answer];
+      let tempanswers = [...currentQuestion?.incorrect_answers, currentQuestion?.correct_answer];
       
       // Scramble the order of the answers array using Fisher-Yates shuffle algorithm
-      for (let i = answers.length - 1; i > 0; i--) {
+      for (let i = tempanswers.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [answers[i], answers[j]] = [answers[j], answers[i]];
+        [tempanswers[i], tempanswers[j]] = [tempanswers[j], tempanswers[i]];
       }
   
-      allAnswers = answers.map((answer, index) => ({
+      setAllAnswers(tempanswers.map((answer, index) => ({
         id: index,
         name: answer,
-      }));
-      
-      console.log('current question', allAnswers);
+      })));
     }
   }, [currentQuestion]);
 
   useEffect(() => {
-    console.log('allAnswers', allAnswers);
-    console.log('answer', answer);
-  }, [allAnswers, answer]);
-
+    console.log('all answers test', allAnswers)
+  }, [allAnswers])
 
   return (
     <div>
@@ -71,13 +61,16 @@ const Page = ({ params }) => {
         </div>
       )}
       test
-      <MappedToggleButton
-        object={allAnswers}
-        state={answer}
-        setState={setAnswer}
-        ariaLabel={ANSWER}
-        value='name'
-      />
+      {console.log('in app', allAnswers)}
+      {allAnswers.length > 0 && ( // Render MappedToggleButton only when allAnswers is populated
+        <MappedToggleButton
+          object={allAnswers}
+          state={answer}
+          setState={setAnswer}
+          ariaLabel={ANSWER}
+          value='name'
+        />
+      )}
       <button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
         Previous Question
       </button>

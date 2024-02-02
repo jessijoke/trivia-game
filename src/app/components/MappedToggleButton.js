@@ -4,6 +4,7 @@ import {
     ToggleButtonGroup,
     Grid,
 } from '@mui/material';
+import { purifyHtml } from '../utils';
 
 const MappedToggleButton = ({ object, state, setState, ariaLabel, value = 'id' }) => {
     const handleToggle = (value) => {
@@ -11,8 +12,9 @@ const MappedToggleButton = ({ object, state, setState, ariaLabel, value = 'id' }
       setState(isSelected ? null : value);
     };
     useEffect(() => {
-      console.log('receieved answers', object)
+      // console.log('receieved answers', object)
     }, [object])
+    
     
   
     return (
@@ -33,7 +35,7 @@ const MappedToggleButton = ({ object, state, setState, ariaLabel, value = 'id' }
                   height: '100%',
                 }}
               >
-                {object[id].name}
+                <div dangerouslySetInnerHTML={{ __html: purifyHtml(object[id].name) }}></div>
               </ToggleButton>
             </Grid>
           ))}

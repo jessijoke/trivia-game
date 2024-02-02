@@ -17,18 +17,10 @@ export default function Home() {
 
   const [category, setCategory] = useState('');
   const [difficulty, setDifficulty] = useState('');
-  const [categoryList, setCategoryList] = useState({});
+  const [categoryList, setCategoryList] = useState([]);
   const { quizData, setQuizData } = useQuiz();
 
   const APIUrl = `https://opentdb.com/api.php?amount=10&category=${category}${difficulty !== null ? `&difficulty=${difficulty}` : ''}&type=multiple`;
-
-  const handleButtonGroup = (
-    setChange
-  ) => (newValue
-  ) => {
-      console.log(newValue);
-      setChange(newValue);
-  };
 
   const navigateToQuiz = () => {
     fetchQuizData();
@@ -36,30 +28,55 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (category.length >= 1) return;
+    //isMounted handles async issues with useEffect and setting state
+    let isMounted = true;
+
+    if (categoryList.length >= 1 || !isMounted) return;
+
     fetch('https://opentdb.com/api_category.php')
-      .then(response => response.json())
-      .then(data => {
-        const transformedData = data.trivia_categories.map(category => ({
-          id: category.id,
-          name: category.name,
-        }));
-        setCategoryList(transformedData);
-      })
-      .catch(error => console.error(error));
+        .then(response => response.json())
+        .then(data => {
+            if (isMounted) {
+                const transformedData = data.trivia_categories.map(category => ({
+                    id: category.id,
+                    name: category.name,
+                }));
+                console.log('Transformed Data', transformedData);
+                setCategoryList(transformedData);
+            }
+        })
+        .catch(error => console.error(error));
+
+    // Cleanup function
+    return () => {
+        isMounted = false;
+    };
   }, []);
 
   const fetchQuizData = () => {
-    console.log(APIUrl);
+    //isMounted handles async issues with useEffect and setting state
+    let isMounted = true;
+
+    if (quizData.length >= 1 || !isMounted) return;
+
     fetch(APIUrl)
       .then(response => response.json())
       .then(data => {
-        console.log(data); // Log the fetched data
-        setQuizData(data.results); // Update the quizData state with the fetched data
-      })
+        console.log(data.results); // Log the fetched data
+        const quizData = data.results.map(result => ({
+          question: result.question,
+          answers: [...result.incorrect_answers, result.correct_answer],
+          correctAnswer: result.correct_answer
+        }));
+
+        setQuizData(quizData); // Update the quizData state with the fetched data
+        })
       .catch(error => console.error(error));
+
+    return () => {
+      isMounted = false;
+    };
   };
-  console.log('categoryList', )
 
   return (
     <Container>

@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { useQuiz } from '../QuizContext';
+import { useQuiz } from '../hooks/QuizContext';
 import { useSearchParams } from 'next/navigation'
 import { StyledH1, StyledH2, StyledH3, MappedToggleButton } from '../components/';
 import {
@@ -59,30 +59,34 @@ const Page = ({ params }) => {
   return (
     <Container>
       <Box minHeight="100vh" display="flex" flexDirection="column" justifyContent="space-around" sx={{ bgcolor: 'white' }}>
-        <div>
+        <Container>
           <StyledH1 text={'Trivia Quiz'} />
-          {currentQuestion && (
-            <div>
-              <StyledH2 text={`Question ${currentPage}`} />
-              <StyledH3 text={currentQuestion.question} />
-            </div>
+        </Container>
+        <Container>
+        {currentQuestion && (
+          <div>
+            <StyledH2 text={`Question ${currentPage}`} />
+            <StyledH3 text={currentQuestion.question} />
+          </div>
+        )}
+        </Container>
+        <Container>
+          {/* {console.log('in app', allAnswers)} */}
+          {allAnswers.length > 0 && ( // Render MappedToggleButton only when allAnswers is populated
+            <MappedToggleButton
+              object={allAnswers}
+              state={answer}
+              setState={setAnswer}
+              ariaLabel={ANSWER}
+              value='name'
+            />
           )}
-          <Container>
-            {/* {console.log('in app', allAnswers)} */}
-            {allAnswers.length > 0 && ( // Render MappedToggleButton only when allAnswers is populated
-              <MappedToggleButton
-                object={allAnswers}
-                state={answer}
-                setState={setAnswer}
-                ariaLabel={ANSWER}
-                value='name'
-              />
-            )}
-          </Container>
+        </Container>
+        <Container>
           <Button variant='contained' onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>Previous Question</Button>
           <span> Question {currentPage} of {quizData.length} </span>
           <Button variant='contained' onClick={(e) => handlePageChange(currentPage + 1, e)} disabled={currentPage === quizData.length}>Next Question</Button>
-        </div>
+        </Container>
       </Box>
     </Container>
   );

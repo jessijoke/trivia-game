@@ -10,48 +10,24 @@ import {
 } from '@mui/material';
 import { StyledH1, StyledH2, StyledH3, MappedToggleButton } from '../app/components/';
 import { CATEGORY, DIFFICULTY, DIFFICULTIES } from './consts.js';
-import { useQuiz } from './QuizContext';
+import { useQuiz } from './hooks/QuizContext';
+import { constructAPIUrl } from './utils';
+import useTriviaCategories from './hooks/UseTriviaCategories';
 
 export default function Home() {
   const router = useRouter();
 
   const [category, setCategory] = useState('');
   const [difficulty, setDifficulty] = useState('');
-  const [categoryList, setCategoryList] = useState([]);
+  const categoryList = useTriviaCategories();
   const { quizData, setQuizData } = useQuiz();
 
-  const APIUrl = `https://opentdb.com/api.php?amount=10&category=${category}${difficulty !== null ? `&difficulty=${difficulty}` : ''}&type=multiple`;
+  const APIUrl = constructAPIUrl(category, difficulty);
 
   const navigateToQuiz = () => {
     fetchQuizData();
     router.push(`/quiz`);
   };
-
-  useEffect(() => {
-    //isMounted handles async issues with useEffect and setting state
-    let isMounted = true;
-
-    if (categoryList.length >= 1 || !isMounted) return;
-
-    fetch('https://opentdb.com/api_category.php')
-        .then(response => response.json())
-        .then(data => {
-            if (isMounted) {
-                const transformedData = data.trivia_categories.map(category => ({
-                    id: category.id,
-                    name: category.name,
-                }));
-                console.log('Transformed Data', transformedData);
-                setCategoryList(transformedData);
-            }
-        })
-        .catch(error => console.error(error));
-
-    // Cleanup function
-    return () => {
-        isMounted = false;
-    };
-  }, []);
 
   const fetchQuizData = () => {
     //isMounted handles async issues with useEffect and setting state
